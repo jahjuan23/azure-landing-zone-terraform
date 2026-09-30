@@ -42,6 +42,44 @@ Tenant Root Group
 | `identity` | User-assigned managed identity; Conditional Access template | Identity |
 | `workload` | Linux App Service with VNet integration (outbound) and private endpoint (inbound) | Infrastructure |
 
+## Proof it works
+
+Deployed end to end from Azure Cloud Shell into a pay-as-you-go subscription (43 resources), then tested. The subscription ID and home IP are redacted.
+
+### Governance
+
+**Management group hierarchy.** The subscription lands under Corp, inside Landing Zones.
+
+![Management group hierarchy](docs/images/01-management-group-hierarchy.png)
+
+**Policy blocks non-compliant deployments.** A resource group in a disallowed region, and one missing the required tags, are both rejected with `RequestDisallowedByPolicy`.
+
+![Policy denials for region and tags](docs/images/02-policy-deny-region-and-tags.png)
+
+**Compliance at management-group scope.** Policy state summarized across the Landing Zones management group.
+
+![Policy compliance summary](docs/images/03-policy-compliance-summary.png)
+
+### Networking and workload
+
+**Hub-spoke peering and private DNS.** Peering in both directions, and a `privatelink.azurewebsites.net` zone linked to the VNets so the App Service resolves to its private endpoint.
+
+![Peering and private DNS code](docs/images/04-networking-peering-private-dns.png)
+
+**Deny-by-default access to the App Service.** Only listed IPs are allowed, and the Kudu/SCM site is locked down the same way.
+
+![App Service IP restriction code](docs/images/06-workload-ip-restrictions.png)
+
+**Deployed and enforced.** The final apply completes, and a request from an unlisted IP (Cloud Shell) gets `403`.
+
+![Apply complete and 403 check](docs/images/07-apply-complete-403-check.png)
+
+### Monitoring
+
+**Allowed and denied traffic in Log Analytics.** App Service HTTP logs and IPSec audit logs show requests from the allowlisted IP succeeding and the Cloud Shell request denied by the default action.
+
+![KQL results for allowed and denied requests](docs/images/05-kql-ip-allow-deny-logs.png)
+
 ## Decisions
 
 | ADR | Decision |
