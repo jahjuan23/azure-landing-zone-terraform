@@ -1,0 +1,29 @@
+# Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored.
+#   cp terraform.tfvars.example terraform.tfvars
+
+# az account show --query id -o tsv
+subscription_id = "00000000-0000-0000-0000-000000000000"
+
+# az account show --query tenantId -o tsv
+tenant_id = "11111111-1111-1111-1111-111111111111"
+
+# 2-6 lowercase letters/digits, e.g. your initials
+org_prefix = "jj"
+
+location          = "eastus2"
+allowed_locations = ["eastus", "eastus2", "centralus"]
+
+# Your home IP so you can open the app in a browser. Get it with:
+#   curl -s https://ifconfig.me
+# Leave as [] to make the app private-only.
+allowed_public_ips = ["203.0.113.10/32"]
+
+budget_amount        = 20
+budget_contact_email = "you@example.com"
+
+tags = {
+  owner       = "jj"
+  costCenter  = "lab"
+  environment = "prod"
+  managedBy   = "terraform"
+}
